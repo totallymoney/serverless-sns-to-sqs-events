@@ -1,0 +1,43 @@
+service: serverless-sns-to-sqs-events
+
+plugins:
+  - serverless-sns-to-sqs-events
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stackTags:
+    Team: DuckTales
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - snsToSqs: # subscribe existing queue to existing topic
+          sns: !Ref MyTopic
+          rawMessageDelivery: true
+          sqs: !GetAtt MyQueue.Arn
+      - snsToSqs: # configure new queue and subscribe to new topic
+          sns:
+            topicName: yc-test-${self:provider.region}
+            displayName: yc-test-${self:provider.region}
+          rawMessageDelivery: false
+          batchSize: 10
+          sqs:
+            delaySeconds: 60
+            visibilityTimeout: 120
+            queueName: yc-test-${self:provider.region}
+            dlq:
+              maxReceiveCount: 3
+              visibilityTimeout: 120
+              queueName: yc-test-dlq-${self:provider.region}
+
+resources:
+  Resources:
+    MyTopic:
+      Type: AWS::SNS::Topic
+      Properties: {}
+
+    MyQueue:
+      Type: AWS::SQS::Queue
+      Properties: {}
