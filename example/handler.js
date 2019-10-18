@@ -1,5 +1,5 @@
-'use strict';
+"use strict";
 
 module.exports.hello = async event => {
-  console.log(JSON.stringify(event))
+	console.log(JSON.stringify(event));
 };

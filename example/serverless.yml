@@ -1,7 +1,9 @@
 service: serverless-sns-to-sqs-events
 
 plugins:
-  - serverless-sns-to-sqs-events
+  localPath: '../src'
+  modules:
+    - index
 
 provider:
   name: aws

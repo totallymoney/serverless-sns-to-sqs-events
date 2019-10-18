@@ -32,7 +32,9 @@
   "scripts": {
     "test": "jest --config=jest.config.js",
     "test:lint": "eslint .",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "prettier:ci": "prettier --list-different \"src/**/*.js\"",
+    "prettier:fix": "prettier --write \"./src/**/*.js\""
   },
   "repository": {
     "type": "git",
@@ -44,5 +46,21 @@
   "bugs": {
     "url": "https://github.com/totallymoney/serverless-sns-to-sqs-events/issues"
   },
-  "homepage": "https://github.com/totallymoney/serverless-sns-to-sqs-events#readme"
+  "homepage": "https://github.com/totallymoney/serverless-sns-to-sqs-events#readme",
+  "prettier": {
+    "useTabs": true,
+    "tabWidth": 4,
+    "printWidth": 90
+  },
+  "husky": {
+    "hooks": {
+        "pre-commit": "lint-staged",
+        "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+      "*.js": [
+          "eslint"
+      ]
+  }
 }
