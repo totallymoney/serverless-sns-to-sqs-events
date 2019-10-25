@@ -50,7 +50,7 @@
   "prettier": {
     "useTabs": true,
     "tabWidth": 4,
-    "printWidth": 90
+    "printWidth": 120
   },
   "husky": {
     "hooks": {

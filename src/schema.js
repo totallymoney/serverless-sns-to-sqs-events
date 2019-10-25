@@ -17,7 +17,7 @@ const arn = Joi.alternatives().try(
 	Joi.object().keys({
 		"Fn::Sub": Joi.alternatives().try(
 			Joi.string(),
-			Joi.array()
+			Joi.array().length(2)
 		)
 	})
 );

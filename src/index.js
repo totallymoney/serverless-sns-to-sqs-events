@@ -48,6 +48,7 @@ class ServerlessSnsToSqsEvents {
 		const dlqLogicalId = this.getLogicalId(dlqConfig.queueName, "Queue");
 
 		this.addToTemplate(dlqLogicalId, dlq);
+		this.verboseLog(`added DLQ [${dlqConfig.queueName}] as [${dlqLogicalId}]`);
 
 		const redrivePolicy = {
 			maxReceiveCount: dlqConfig.maxReceiveCount,
@@ -60,6 +61,8 @@ class ServerlessSnsToSqsEvents {
 	}
 
 	createSqsQueue(sqs, redrivePolicy) {
+		this.verboseLog(`creating SQS queue: ${sqs.queueName}`);
+
 		return {
 			Type : "AWS::SQS::Queue",
 			Properties : {
@@ -84,6 +87,7 @@ class ServerlessSnsToSqsEvents {
 		const sqsQueueLogicalId = this.getLogicalId(sqs.queueName, "Queue");
 
 		this.addToTemplate(sqsQueueLogicalId, sqsQueue);
+		this.verboseLog(`added SQS queue [${sqs.queueName}] as [${sqsQueueLogicalId}]`);
 
 		return {
 			"Fn::GetAtt": [sqsQueueLogicalId, "Arn"]
@@ -105,7 +109,7 @@ class ServerlessSnsToSqsEvents {
 		}
 	}
 
-	createSnsTopic( sns ) {
+	createSnsTopic(sns) {
 		return {
 			Type : "AWS::SNS::Topic",
 			Properties : {
@@ -124,6 +128,7 @@ class ServerlessSnsToSqsEvents {
 		const snsTopicLogicalId = this.getLogicalId(sns.displayName, "Topic");
 
 		this.addToTemplate(snsTopicLogicalId, snsTopic);
+		this.verboseLog(`added SNS topic [${sns.topicName}] as [${snsTopicLogicalId}]`);
 
 		return {
 			Ref: snsTopicLogicalId
@@ -222,10 +227,13 @@ class ServerlessSnsToSqsEvents {
 						const snsSubscription = this.createSnsSubscription(sqsArn, snsArn, value);
 						const snsSubscriptionLogicalId = this.getSnsSubscriptionLogicalId(functionName, sqsArn, snsArn);
 						this.addToTemplate(snsSubscriptionLogicalId, snsSubscription);
+						this.verboseLog(`added SNS subscription: ${snsSubscription}`);
+
 						const sqsUrl = this.getSqsUrl(sqsArn);
 						const sqsPolicy = this.createSqsPolicy(sqsArn, snsArn, sqsUrl);
 						const sqsPolicyLogicalId = this.getSqsPolicyLogicalId(functionName, sqsArn, snsArn);
 						this.addToTemplate(sqsPolicyLogicalId, sqsPolicy);
+						this.verboseLog(`added SQS queue policy: ${sqsPolicy}`);
             
 						sqsEvents.push({
 							sqs: {
