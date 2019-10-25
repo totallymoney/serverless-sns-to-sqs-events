@@ -26,11 +26,7 @@ class ServerlessSnsToSqsEvents {
 	}
 
 	isArn(input) {
-		return _.isString(input) 
-      || input.Ref 
-      || input["Fn::GetAtt"] 
-      || input["Fn::Import"]
-      || input["Fn::Sub"];
+		return _.isString(input) || input.Ref || input["Fn::GetAtt"] || input["Fn::Import"] || input["Fn::Sub"];
 	}
 
 	getLogicalId(name, type) {
@@ -57,21 +53,21 @@ class ServerlessSnsToSqsEvents {
 			}
 		};
 
-		return {dlq, redrivePolicy};
+		return { dlq, redrivePolicy };
 	}
 
 	createSqsQueue(sqs, redrivePolicy) {
 		this.verboseLog(`creating SQS queue: ${sqs.queueName}`);
 
 		return {
-			Type : "AWS::SQS::Queue",
-			Properties : {
-				DelaySeconds : sqs.delaySeconds,
-				MaximumMessageSize : sqs.maximumMessageSize,
-				MessageRetentionPeriod : sqs.messageRetentionPeriod,
-				QueueName : sqs.queueName,
-				RedrivePolicy : redrivePolicy,
-				VisibilityTimeout : sqs.visibilityTimeout
+			Type: "AWS::SQS::Queue",
+			Properties: {
+				DelaySeconds: sqs.delaySeconds,
+				MaximumMessageSize: sqs.maximumMessageSize,
+				MessageRetentionPeriod: sqs.messageRetentionPeriod,
+				QueueName: sqs.queueName,
+				RedrivePolicy: redrivePolicy,
+				VisibilityTimeout: sqs.visibilityTimeout
 			}
 		};
 	}
@@ -81,7 +77,7 @@ class ServerlessSnsToSqsEvents {
 			return sqs;
 		}
 
-		const {redrivePolicy} = this.getDlq(sqs.dlq);
+		const { redrivePolicy } = this.getDlq(sqs.dlq);
 
 		const sqsQueue = this.createSqsQueue(sqs, redrivePolicy);
 		const sqsQueueLogicalId = this.getLogicalId(sqs.queueName, "Queue");
@@ -111,16 +107,16 @@ class ServerlessSnsToSqsEvents {
 
 	createSnsTopic(sns) {
 		return {
-			Type : "AWS::SNS::Topic",
-			Properties : {
-				DisplayName : sns.displayName,
-				TopicName : sns.topicName
+			Type: "AWS::SNS::Topic",
+			Properties: {
+				DisplayName: sns.displayName,
+				TopicName: sns.topicName
 			}
 		};
 	}
 
 	getOrCreateSnsTopic({ sns }) {
-		if (this.isArn(sns)){
+		if (this.isArn(sns)) {
 			return sns;
 		}
 
@@ -135,24 +131,24 @@ class ServerlessSnsToSqsEvents {
 		};
 	}
 
-	createSnsSubscription(sqsArn, snsArn, { rawMessageDelivery, filterPolicy }){
+	createSnsSubscription(sqsArn, snsArn, { rawMessageDelivery, filterPolicy }) {
 		return {
-			Type : "AWS::SNS::Subscription",
-			Properties : {
+			Type: "AWS::SNS::Subscription",
+			Properties: {
 				Protocol: "sqs",
 				Endpoint: sqsArn,
 				RawMessageDelivery: rawMessageDelivery,
 				FilterPolicy: filterPolicy,
-				TopicArn : snsArn
+				TopicArn: snsArn
 			}
 		};
 	}
 
-	createSqsPolicy(sqsArn, snsArn, sqsUrl){
+	createSqsPolicy(sqsArn, snsArn, sqsUrl) {
 		return {
-			Type : "AWS::SQS::QueuePolicy",
-			Properties : {
-				Queues: [ sqsUrl ],
+			Type: "AWS::SQS::QueuePolicy",
+			Properties: {
+				Queues: [sqsUrl],
 				PolicyDocument: {
 					Version: "2012-10-17",
 					Statement: {
@@ -217,7 +213,7 @@ class ServerlessSnsToSqsEvents {
 				const sqsEvents = [];
 				functionObj.events.forEach(event => {
 					if (event.snsToSqs) {
-						const {value, error} = schema.validate(event.snsToSqs);
+						const { value, error } = schema.validate(event.snsToSqs);
 						if (error) {
 							this.error(error);
 						}
@@ -234,7 +230,7 @@ class ServerlessSnsToSqsEvents {
 						const sqsPolicyLogicalId = this.getSqsPolicyLogicalId(functionName, sqsArn, snsArn);
 						this.addToTemplate(sqsPolicyLogicalId, sqsPolicy);
 						this.verboseLog(`added SQS queue policy: ${sqsPolicy}`);
-            
+
 						sqsEvents.push({
 							sqs: {
 								arn: sqsArn,
