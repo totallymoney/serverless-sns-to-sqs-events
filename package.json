@@ -10,6 +10,9 @@
     "@hapi/joi": "^16.1.7",
     "lodash": "^4.17.15"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@commitlint/cli": "^8.1.0",
     "@commitlint/config-conventional": "^8.0.0",
