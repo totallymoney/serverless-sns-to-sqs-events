@@ -1,5 +1,5 @@
 {
-  "name": "serverless-sns-to-sqs-events",
+  "name": "@totallymoney/serverless-sns-to-sqs-events",
   "version": "0.0.0-dev",
   "description": "",
   "main": "commitlint.config.js",

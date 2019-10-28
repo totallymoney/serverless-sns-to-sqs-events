@@ -4,7 +4,13 @@
 [![CircleCI](https://circleci.com/gh/totallymoney/serverless-sns-to-sqs-events.svg?style=svg)](https://circleci.com/gh/totallymoney/serverless-sns-to-sqs-events)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A [Serverless framework](https://serverless.com/framework) plugin that simplifies the configuration of SNS to SQS to Lambda.
+To install, run
+
+```
+npm i --save-dev @totallymoney/serverless-sns-to-sqs-events
+```
+
+This is a [Serverless framework](https://serverless.com/framework) plugin that simplifies the configuration of SNS to SQS to Lambda.
 
 Instead of:
 
