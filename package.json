@@ -1,6 +1,6 @@
 {
   "name": "serverless-sns-to-sqs-events",
-  "version": "1.0.0",
+  "version": "0.0.0-dev",
   "description": "",
   "main": "commitlint.config.js",
   "directories": {
@@ -32,7 +32,7 @@
   "scripts": {
     "test": "jest --config=jest.config.js",
     "test:lint": "eslint .",
-    "semantic-release": "semantic-release --allow-same-version",
+    "semantic-release": "semantic-release",
     "prettier:ci": "prettier --list-different \"src/**/*.js\"",
     "prettier:fix": "prettier --write \"./src/**/*.js\""
   },
