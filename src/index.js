@@ -41,7 +41,8 @@ class ServerlessSnsToSqsEvents {
 		}
 
 		const dlq = this.createSqsQueue(dlqConfig);
-		const dlqLogicalId = this.getLogicalId(dlqConfig.queueName, "Queue");
+		const dlqLogicalId = 
+      dlqConfig.logicalId || this.getLogicalId(dlqConfig.queueName, "Queue");
 
 		this.addToTemplate(dlqLogicalId, dlq);
 		this.verboseLog(`added DLQ [${dlqConfig.queueName}] as [${dlqLogicalId}]`);
@@ -80,7 +81,8 @@ class ServerlessSnsToSqsEvents {
 		const { redrivePolicy } = this.getDlq(sqs.dlq);
 
 		const sqsQueue = this.createSqsQueue(sqs, redrivePolicy);
-		const sqsQueueLogicalId = this.getLogicalId(sqs.queueName, "Queue");
+		const sqsQueueLogicalId =
+      sqs.logicalId || this.getLogicalId(sqs.queueName, "Queue");
 
 		this.addToTemplate(sqsQueueLogicalId, sqsQueue);
 		this.verboseLog(`added SQS queue [${sqs.queueName}] as [${sqsQueueLogicalId}]`);
@@ -121,7 +123,8 @@ class ServerlessSnsToSqsEvents {
 		}
 
 		const snsTopic = this.createSnsTopic(sns);
-		const snsTopicLogicalId = this.getLogicalId(sns.displayName, "Topic");
+		const snsTopicLogicalId =
+      sns.logicalId || this.getLogicalId(sns.displayName, "Topic");
 
 		this.addToTemplate(snsTopicLogicalId, snsTopic);
 		this.verboseLog(`added SNS topic [${sns.topicName}] as [${snsTopicLogicalId}]`);

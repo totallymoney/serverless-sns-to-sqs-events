@@ -109,7 +109,28 @@ describe("serverless-sns-to-sqs-events", () => {
     
 		shouldAddSnsSubscription(resources, snsArn, sqsArn);
 		shouldAddQueuePolicy(resources, snsArn, sqsArn, sqsUrl); 
-	});	
+	});
+  
+	test("when SNS logicalId is defined, it's used instead", () => {
+		const sns = {
+			logicalId: "MyTopic",
+			topicName: "topicName",
+			displayName: "displayName"
+		};
+		const sqsArn = { "Fn::GetAtt": ["MyQueue", "Arn"] };
+		const sqsUrl = { Ref: "MyQueue" };
+		givenAnSnsToSqsEvent(sns, sqsArn);
+
+		snsToSqsPlugin.hooks[hook]();
+		const resources = serverless.service.provider.compiledCloudFormationTemplate.Resources;
+    
+		expect(Object.keys(resources)).toHaveLength(3);
+    
+		const snsArn = { Ref: "MyTopic" };
+    
+		shouldAddSnsSubscription(resources, snsArn, sqsArn);
+		shouldAddQueuePolicy(resources, snsArn, sqsArn, sqsUrl); 
+	});
   
 	test("when SQS is not a GetAtt or an Arn, a new queue is created", () => {
 		const snsArn = { Ref: "my-topic" };
@@ -129,6 +150,26 @@ describe("serverless-sns-to-sqs-events", () => {
         
 		shouldAddSnsSubscription(resources, snsArn, sqsArn);
 		shouldAddQueuePolicy(resources, snsArn, sqsArn, sqsUrl); 
+	});
+  
+	test("when SQS logicalId is defined, it's used instead", () => {
+		const snsArn = { Ref: "my-topic" };
+		const sqs = {
+			logicalId: "MyQueue",
+			queueName: "my-queue"
+		};
+		givenAnSnsToSqsEvent(snsArn, sqs);
+
+		snsToSqsPlugin.hooks[hook]();
+		const resources = serverless.service.provider.compiledCloudFormationTemplate.Resources;
+    
+		expect(Object.keys(resources)).toHaveLength(3);
+    
+		const sqsArn = { "Fn::GetAtt": ["MyQueue", "Arn"] };
+		const sqsUrl = { Ref: "MyQueue" };
+        
+		shouldAddSnsSubscription(resources, snsArn, sqsArn);
+		shouldAddQueuePolicy(resources, snsArn, sqsArn, sqsUrl);
 	});
   
 	test("when SQS defines a DLQ, two new queues are created", () => {
@@ -163,7 +204,39 @@ describe("serverless-sns-to-sqs-events", () => {
 		shouldAddSnsSubscription(resources, snsArn, sqsArn);
 		shouldAddQueuePolicy(resources, snsArn, sqsArn, sqsUrl);
 	});
-	
+  
+	test("when DLQ logicalId is defined, it's used instead", () => {
+		const snsArn = { Ref: "my-topic" };
+		const sqs = {
+			queueName: "my-queue",
+			dlq: {
+				logicalId: "MyDLQ",
+				queueName: "my-dlq-queue",
+				maxReceiveCount: 3
+			}
+		};
+		givenAnSnsToSqsEvent(snsArn, sqs);
+
+		snsToSqsPlugin.hooks[hook]();
+		const resources = serverless.service.provider.compiledCloudFormationTemplate.Resources;
+    
+		expect(Object.keys(resources)).toHaveLength(4);
+    
+		const logicalId = shouldAddSqsQueue(resources, "my-queue");
+		const sqsArn = { "Fn::GetAtt": [logicalId, "Arn"] };
+		const sqsUrl = { Ref: logicalId };
+    
+		const sqsResource = resources[logicalId];
+		expect(sqsResource.Properties.RedrivePolicy).toEqual({
+			maxReceiveCount: 3,
+			deadLetterTargetArn: {
+				"Fn::GetAtt": ["MyDLQ", "Arn"]
+			}
+		});
+        
+		shouldAddSnsSubscription(resources, snsArn, sqsArn);
+		shouldAddQueuePolicy(resources, snsArn, sqsArn, sqsUrl);
+	});
 });
 
 function givenAnSnsToSqsEvent (sns, sqs, rawDelivery) {

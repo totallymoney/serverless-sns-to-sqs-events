@@ -19,12 +19,14 @@ const arn = Joi.alternatives().try(
 const sns = Joi.alternatives().try(
 	arn,
 	Joi.object({
+		logicalId: Joi.string(),
 		displayName: Joi.string().required(),
 		topicName: Joi.string()
 	})
 );
 
 const sqsQueue = Joi.object({
+	logicalId: Joi.string(),
 	queueName: Joi.string().required(),
 	delaySeconds: Joi.number()
 		.min(0)
