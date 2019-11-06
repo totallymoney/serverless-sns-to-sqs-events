@@ -23,6 +23,9 @@ Instead of:
 you can do all 5 as a `snsToSqs` event:
 
 ```yml
+plugins:
+  - "@totallymoney/serverless-sns-to-sqs-events"
+
 functions:
   hello:
     handler: handler.hello
