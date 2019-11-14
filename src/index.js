@@ -26,7 +26,7 @@ class ServerlessSnsToSqsEvents {
 	}
 
 	isArn(input) {
-		return _.isString(input) || input.Ref || input["Fn::GetAtt"] || input["Fn::Import"] || input["Fn::Sub"];
+		return _.isString(input) || input.Ref || input["Fn::GetAtt"] || input["Fn::ImportValue"] || input["Fn::Sub"];
 	}
 
 	getLogicalId(name, type) {
@@ -187,6 +187,8 @@ class ServerlessSnsToSqsEvents {
 			return this.getLogicalId(snsName, "Topic");
 		} else if (snsArn.Ref) {
 			return snsArn.Ref;
+		} else if (snsArn["Fn::ImportValue"]) {
+			return this.getLogicalId(snsArn["Fn::ImportValue"], "Topic");
 		} else {
 			this.error(new Error("Unable to convert snsArn to logical Id", snsArn));
 		}
