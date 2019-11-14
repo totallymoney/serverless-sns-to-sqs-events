@@ -77,6 +77,18 @@ describe("serverless-sns-to-sqs-events", () => {
     
 		noQueueOrTopicIsCreated(resources, snsArn, sqsArn, sqsUrl); 
 	});
+
+	test("when SNS is an ImportValue, no topic is created", () => {
+		const snsArn = { "Fn::ImportValue": "MyExportedTopic"};
+		const sqsArn = { "Fn::GetAtt": ["MyQueue", "Arn"] };
+		const sqsUrl = { Ref: "MyQueue" };
+		givenAnSnsToSqsEvent(snsArn, sqsArn);
+
+		snsToSqsPlugin.hooks[hook]();
+		const resources = serverless.service.provider.compiledCloudFormationTemplate.Resources;
+		 
+		noQueueOrTopicIsCreated(resources, snsArn, sqsArn, sqsUrl); 
+	});
   
 	test("when SQS is an ARN, no queue is created", () => {
 		const snsArn = { Ref: "MyTopic" };
